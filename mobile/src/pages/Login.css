@@ -1,0 +1,39 @@
+.login-content {
+  --background: linear-gradient(160deg, #1a3a5c 0%, #0f1419 55%);
+}
+
+.login-wrap {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 2rem;
+  text-align: center;
+}
+
+.login-logo {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-wrap h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+}
+
+.login-wrap > p {
+  color: var(--ion-color-medium);
+  margin-bottom: 2rem;
+}
+
+.login-form {
+  background: transparent;
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.login-hint {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+}
