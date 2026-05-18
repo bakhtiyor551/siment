@@ -4,19 +4,22 @@ function getToken() {
   return localStorage.getItem('token');
 }
 
-export async function api<T = unknown>(path: string, options: RequestInit & { body?: unknown } = {}): Promise<T> {
+type ApiOptions = Omit<RequestInit, 'body'> & { body?: unknown };
+
+export async function api<T = unknown>(path: string, options: ApiOptions = {}): Promise<T> {
+  const { body, ...rest } = options;
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
+    ...(rest.headers as Record<string, string>),
   };
 
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
+    ...rest,
     headers,
-    body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
   const data = await res.json().catch(() => ({}));

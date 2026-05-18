@@ -40,7 +40,7 @@ const Login: React.FC = () => {
     <IonPage>
       <IonContent className="login-content" fullscreen>
         <div className="login-wrap">
-          <motion.div className="login-logo">🧱</div>
+          <div className="login-logo">🧱</div>
           <h1>Siment</h1>
           <p>Продажа цементных блоков</p>
 
