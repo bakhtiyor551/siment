@@ -1,4 +1,4 @@
-import { Redirect, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import {
   IonIcon,
   IonLabel,
@@ -32,23 +32,24 @@ const Tabs: React.FC = () => {
 
   return (
     <IonTabs>
-      <IonRouterOutlet>
-        <Route exact path="/tabs/dashboard" component={Dashboard} />
-        <Route exact path="/tabs/stock" component={Stock} />
-        {canSell && <Route exact path="/tabs/sale" component={Sale} />}
-        {canSell && <Route exact path="/tabs/sales" component={SalesList} />}
-        {canProduce && <Route exact path="/tabs/production" component={Production} />}
-        <Route exact path="/tabs/settings" component={Settings} />
-        <Route exact path="/tabs">
-          <Redirect
-            to={
-              role === 'worker'
-                ? '/tabs/production'
-                : canSell
-                  ? '/tabs/dashboard'
-                  : '/tabs/stock'
-            }
-          />
+      <IonRouterOutlet id="tabs">
+        <Route exact path="/tabs/dashboard">
+          <Dashboard />
+        </Route>
+        <Route exact path="/tabs/stock">
+          <Stock />
+        </Route>
+        <Route exact path="/tabs/sale">
+          <Sale />
+        </Route>
+        <Route exact path="/tabs/sales">
+          <SalesList />
+        </Route>
+        <Route exact path="/tabs/production">
+          <Production />
+        </Route>
+        <Route exact path="/tabs/settings">
+          <Settings />
         </Route>
       </IonRouterOutlet>
 

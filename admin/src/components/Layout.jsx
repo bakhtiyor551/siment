@@ -7,7 +7,6 @@ const NAV = [
   { to: '/production', label: 'Производство', icon: '🏭', roles: ['admin', 'worker'] },
   { to: '/stock', label: 'Склад', icon: '📦', roles: ['admin', 'seller', 'worker'] },
   { to: '/sales', label: 'Продажи', icon: '💰', roles: ['admin', 'seller'] },
-  { to: '/clients', label: 'Клиенты', icon: '👥', roles: ['admin', 'seller'] },
   { to: '/debts', label: 'Долги', icon: '📋', roles: ['admin', 'seller'] },
   { to: '/reports', label: 'Отчёты', icon: '📈', roles: ['admin'] },
   { to: '/users', label: 'Пользователи', icon: '⚙️', roles: ['admin'] },

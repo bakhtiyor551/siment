@@ -9,26 +9,32 @@ import {
   IonText,
   IonToast,
 } from '@ionic/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getDefaultTabPath } from '../utils/tabs';
 import './Login.css';
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const history = useHistory();
   const [phone, setPhone] = useState('seller');
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      history.replace(getDefaultTabPath(user.role));
+    }
+  }, [user, history]);
+
   const handleLogin = async () => {
     setError('');
     setLoading(true);
     try {
-      const user = await login(phone, password);
-      if (user.role === 'worker') history.replace('/tabs/production');
-      else history.replace('/tabs/dashboard');
+      const loggedIn = await login(phone, password);
+      history.replace(getDefaultTabPath(loggedIn.role));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Ошибка входа');
     } finally {

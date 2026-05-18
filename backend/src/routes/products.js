@@ -77,15 +77,46 @@ router.put('/:id', auth(), requireRoles('admin'), async (req, res) => {
 });
 
 router.delete('/:id', auth(), requireRoles('admin'), async (req, res) => {
+  const conn = await pool.getConnection();
   try {
-    await pool.execute('UPDATE products SET status = "inactive" WHERE id = ?', [
-      req.params.id,
+    const productId = Number(req.params.id);
+
+    const [productRows] = await conn.execute('SELECT id, name FROM products WHERE id = ?', [
+      productId,
     ]);
-    await logAction(req.user.id, 'deactivate', 'product', Number(req.params.id));
+    if (!productRows.length) {
+      return res.status(404).json({ error: 'Товар не найден' });
+    }
+    const product = productRows[0];
+
+    const [salesRows] = await conn.execute(
+      'SELECT COUNT(*) AS cnt FROM sale_items WHERE product_id = ?',
+      [productId]
+    );
+    const salesCount = Number(salesRows[0].cnt);
+
+    if (salesCount > 0) {
+      return res.status(400).json({
+        error:
+          'Нельзя удалить: по товару уже есть продажи. Установите статус «Неактивный» вместо удаления.',
+        code: 'HAS_SALES',
+      });
+    }
+
+    await conn.beginTransaction();
+    await conn.execute('DELETE FROM productions WHERE product_id = ?', [productId]);
+    await conn.execute('DELETE FROM stock WHERE product_id = ?', [productId]);
+    await conn.execute('DELETE FROM products WHERE id = ?', [productId]);
+    await logAction(req.user.id, 'delete', 'product', productId, { name: product.name }, conn);
+    await conn.commit();
+
     res.json({ ok: true });
   } catch (err) {
+    await conn.rollback();
     console.error(err);
     res.status(500).json({ error: 'Ошибка сервера' });
+  } finally {
+    conn.release();
   }
 });
 

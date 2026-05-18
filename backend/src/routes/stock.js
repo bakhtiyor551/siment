@@ -1,8 +1,43 @@
 const express = require('express');
 const pool = require('../config/db');
-const { auth } = require('../middleware/auth');
+const { auth, requireRoles } = require('../middleware/auth');
+const { logAction } = require('../utils/audit');
+const { adjustStock, checkLowStock } = require('../utils/stock');
 
 const router = express.Router();
+
+router.post('/add', auth(), requireRoles('admin', 'seller', 'worker'), async (req, res) => {
+  const conn = await pool.getConnection();
+  try {
+    const { product_id, quantity, comment } = req.body;
+    const qty = Number(quantity);
+    if (!product_id || !qty || qty <= 0) {
+      return res.status(400).json({ error: 'Укажите товар и количество' });
+    }
+
+    await conn.beginTransaction();
+
+    const [result] = await conn.execute(
+      `INSERT INTO productions (product_id, quantity, user_id, comment)
+       VALUES (?, ?, ?, ?)`,
+      [product_id, qty, req.user.id, comment || 'Пополнение склада']
+    );
+
+    await adjustStock(product_id, qty, conn);
+    await logAction(req.user.id, 'stock_add', 'stock', result.insertId, { product_id, quantity: qty }, conn);
+
+    await conn.commit();
+    await checkLowStock(product_id);
+
+    res.status(201).json({ ok: true, production_id: result.insertId });
+  } catch (err) {
+    await conn.rollback();
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  } finally {
+    conn.release();
+  }
+});
 
 router.get('/', auth(), async (req, res) => {
   try {

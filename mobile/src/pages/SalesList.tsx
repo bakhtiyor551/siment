@@ -53,10 +53,10 @@ const SalesList: React.FC = () => {
           {sales.map((s) => (
             <IonItem key={s.id}>
               <IonLabel>
-                <h2>{s.client_name || 'Без клиента'}</h2>
-                <p>
-                  {s.items?.map((i) => `${i.product_name} ×${i.quantity}`).join(', ')}
-                </p>
+                <h2>
+                  {s.items?.map((i) => `${i.quantity} шт`).join(', ') || '—'}
+                </h2>
+                <p>{s.items?.map((i) => i.product_name).join(', ')}</p>
                 <p>
                   {new Date(s.created_at).toLocaleString('ru-RU')} · {PAYMENT_LABELS[s.payment_type]}
                 </p>

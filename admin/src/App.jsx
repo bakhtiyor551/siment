@@ -7,7 +7,6 @@ import Products from './pages/Products';
 import Production from './pages/Production';
 import Stock from './pages/Stock';
 import Sales from './pages/Sales';
-import Clients from './pages/Clients';
 import Debts from './pages/Debts';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
@@ -60,14 +59,6 @@ function AppRoutes() {
           element={
             <PrivateRoute roles={['admin', 'seller']}>
               <Sales />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="clients"
-          element={
-            <PrivateRoute roles={['admin', 'seller']}>
-              <Clients />
             </PrivateRoute>
           }
         />

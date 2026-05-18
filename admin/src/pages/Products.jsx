@@ -61,10 +61,42 @@ export default function Products() {
     }
   };
 
-  const deactivate = async (id) => {
-    if (!confirm('Деактивировать блок?')) return;
-    await api(`/products/${id}`, { method: 'DELETE' });
-    load();
+  const deactivateProduct = async (p) => {
+    setError('');
+    try {
+      await api(`/products/${p.id}`, {
+        method: 'PUT',
+        body: {
+          name: p.name,
+          size: p.size || '',
+          sale_price: p.sale_price,
+          cost_price: p.cost_price,
+          unit: p.unit || 'шт',
+          min_stock: p.min_stock,
+          status: 'inactive',
+        },
+      });
+      load();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const removeProduct = async (p) => {
+    if (!confirm(`Удалить «${p.name}»?\n\nЗаписи производства будут удалены вместе с товаром.`)) {
+      return;
+    }
+    setError('');
+    try {
+      await api(`/products/${p.id}`, { method: 'DELETE' });
+      load();
+    } catch (err) {
+      const msg = err.message || 'Не удалось удалить';
+      setError(msg);
+      if (msg.includes('продажи') && confirm(`${msg}\n\nОтключить товар (неактивный)?`)) {
+        await deactivateProduct(p);
+      }
+    }
   };
 
   return (
@@ -156,11 +188,9 @@ export default function Products() {
                   <button type="button" className="btn-link" onClick={() => openEdit(p)}>
                     Изменить
                   </button>
-                  {p.status === 'active' && (
-                    <button type="button" className="btn-link danger" onClick={() => deactivate(p.id)}>
-                      Выкл.
-                    </button>
-                  )}
+                  <button type="button" className="btn-link danger" onClick={() => removeProduct(p)}>
+                    Удалить
+                  </button>
                 </td>
               </tr>
             ))}

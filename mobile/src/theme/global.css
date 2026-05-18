@@ -33,6 +33,25 @@
   margin: 1rem 0;
 }
 
+.price-fixed {
+  margin-top: 0.35rem;
+  color: var(--ion-color-primary);
+}
+
+.stock-add-card {
+  margin: 12px;
+}
+
+.stock-product-name {
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.stock-select {
+  --padding-start: 0;
+  margin-bottom: 8px;
+}
+
 .loading-center {
   display: flex;
   align-items: center;

@@ -1,9 +1,10 @@
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonSpinner, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonPage, IonSpinner, IonContent, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Tabs from './pages/Tabs';
+import { getDefaultTabPath } from './utils/tabs';
 
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
@@ -22,33 +23,49 @@ import './theme/global.css';
 
 setupIonicReact();
 
+function LoadingScreen() {
+  return (
+    <IonPage>
+      <IonContent className="loading-center">
+        <IonSpinner name="crescent" />
+      </IonContent>
+    </IonPage>
+  );
+}
+
 const AppRoutes: React.FC = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="loading-center">
-        <IonSpinner name="crescent" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
+
+  const home = user ? getDefaultTabPath(user.role) : '/login';
 
   return (
     <IonRouterOutlet>
-      <Route exact path="/login" render={() => (user ? <Redirect to="/tabs" /> : <Login />)} />
-      <Route path="/tabs" render={() => (user ? <Tabs /> : <Redirect to="/login" />)} />
-      <Route exact path="/" render={() => <Redirect to={user ? '/tabs' : '/login'} />} />
+      <Route exact path="/login" component={Login} />
+      <Route
+        exact
+        path="/tabs"
+        render={() => <Redirect to={home} />}
+      />
+      <Route
+        path="/tabs"
+        render={() => (user ? <Tabs /> : <Redirect to="/login" />)}
+      />
+      <Route exact path="/" render={() => <Redirect to={home} />} />
     </IonRouterOutlet>
   );
 };
 
 const App: React.FC = () => (
   <IonApp>
-    <AuthProvider>
-      <IonReactRouter>
+    <IonReactRouter>
+      <AuthProvider>
         <AppRoutes />
-      </IonReactRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </IonReactRouter>
   </IonApp>
 );
 
